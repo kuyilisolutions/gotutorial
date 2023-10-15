@@ -10,7 +10,7 @@ func main() {
     http.Handle("/", http.FileServer(http.Dir("./static")))
     
     fmt.Println("Server is running on :8080")
-    http.ListenAndServe(":8080", nil)
+    http.ListenAndServe(":80", nil)
 }
 
 func processHandler(w http.ResponseWriter, r *http.Request) {
