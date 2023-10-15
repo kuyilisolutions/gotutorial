@@ -1,61 +1,44 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 func main() {
-	// http.HandleFunc("web", processHandler)
-	// http.Handle("/", http.FileServer(http.Dir("./static")))
-
-	// fs := http.FileServer(http.Dir("../../web"))
-
-	// // Handle "/" route to serve static files
-	// http.Handle("/", fs)
-
-	// fmt.Println("Server is running on :8080")
-
 	fs := http.FileServer(http.Dir("web"))
-	// Handle "/" route to serve static files
 	http.Handle("/", fs)
 
 	http.HandleFunc("/process", func(w http.ResponseWriter, r *http.Request) {
-		// Parse the incoming JSON data into a struct
-		fmt.Println("Entering Go Backend")
-		var hostDetails string
-		fmt.Println(r.Body)
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Failed to read request body", http.StatusInternalServerError)
-			return
-		}
-		defer r.Body.Close()
+		// Parse the incoming form values
+		name := r.FormValue("name")
+		data := r.FormValue("data")
 
-		hostDetails = string(body)
-		ds := strings.Split(hostDetails, "=")[1]
-		fmt.Println("Received data:", ds)
-		if ds == "mani" {
-			fmt.Println("Onna number somberi")
-		}
-		if ds == "kather" {
-			fmt.Println("Lusuu pakki")
-		}
-		if ds == "bala" {
-			fmt.Println("ultra level playboy")
-		}
+		// Process the data based on the selected name
+		response := processFormData(name, data)
 
+		// Send a response back to the webpage
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(response))
 	})
-	http.ListenAndServe(":80", nil)
+
+	http.ListenAndServe(":8080", nil)
 }
 
-func processHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		r.ParseForm()
-		data := r.FormValue("data")
-		// Do something with the data, e.g., print it
-		fmt.Println("Received data:", data)
+func processFormData(name, data string) string {
+	// Process the data based on the selected name
+	var response string
+	switch name {
+	case "mani":
+		response = "Mani Prakash: " + data + "Onna number somberi" + "Developer"
+	case "aravind":
+		response = "Aravind: " + data + "Vayadi" + "Developer"
+	case "kather":
+		response = "Katheravan: " + data + "Loosu pakki" + "Developer"
+	case "nitty":
+		response = "Nitty: " + data + "solldraku onnu ilaa" + "Developer"
+	default:
+		response = "Unknown name"
 	}
+	return response
 }
